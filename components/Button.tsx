@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { Pressable, Text, StyleSheet, Animated } from 'react-native';
 // import { useHaptic } from '../hooks/useHaptic';
 
