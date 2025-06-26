@@ -5,7 +5,7 @@ module.exports = {
     name: "reusebob",
     name: IS_DEV ? 'ReuseBob (Dev)' : 'ReuseBob',
     slug: "reusebob",
-    version: "1.0.0",
+    version: "0.2.0",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
     scheme: "reusebob",
