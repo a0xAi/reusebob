@@ -3,7 +3,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import app from '../../firebaseConfig';
-import { Text, View, StyleSheet, SafeAreaView, TextInput, Button, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, StyleSheet, SafeAreaView, TextInput, Image, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import Button from '@/components/Button';
 import { createListing } from '../../database/listing';
 import { useSession } from '../../ctx';
 
@@ -113,22 +114,15 @@ export default function CreateScreen() {
           </Picker>
 
 
-          <Button
-            title="Pick an Image"
-            onPress={pickImage}
-          />
+          <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+            {photo ? (
+              <Image source={{ uri: photo }} style={styles.imagePreview} />
+            ) : (
+              <Text style={styles.imagePickerText}>Tap to add photo</Text>
+            )}
+          </TouchableOpacity>
 
-          {photo && (
-            <Image
-              source={{ uri: photo }}
-              style={styles.imagePreview}
-            />
-          )}
-
-          <Button
-            title="Create"
-            onPress={create}
-          />
+          <Button title="Create" onPress={create} />
         </ScrollView>
       </SafeAreaView>
     </KeyboardAvoidingView>
@@ -136,21 +130,49 @@ export default function CreateScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16 },
-  scrollView: { flex: 1 },
-  title: { fontSize: 24, marginBottom: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    marginBottom: 12,
-    borderRadius: 4
+  container: {
+    padding: 20,
+    backgroundColor: '#F9FAFB',
   },
-  picker: { height: 50, marginBottom: 12 },
-  colorPicker: { height: 200, marginBottom: 12 },
+  scrollView: { flex: 1 },
+  title: {
+    fontSize: 28,
+    fontWeight: '600',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  input: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  picker: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  imagePicker: {
+    height: 180,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  imagePickerText: {
+    color: '#888',
+  },
   imagePreview: {
-    width: 200,
-    height: 200,
-    marginVertical: 12
-  }
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
 });
