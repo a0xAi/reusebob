@@ -4,6 +4,7 @@ import { Text, View, TextInput, StyleSheet, TouchableOpacity } from 'react-nativ
 import { useSession } from '../ctx';
 import app from '../firebaseConfig';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import Button from '@/components/Button';
 
 export default function SignIn() {
   const { signIn } = useSession();
@@ -28,38 +29,50 @@ export default function SignIn() {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.header}>ReuseBob</Text>
       <TextInput style={styles.textInput} placeholder='email' value={email} onChangeText={(text) => setEmail(text)} />
       <TextInput style={styles.textInput} placeholder='password' value={password} onChangeText={(text) => setPassword(text)} />
       {error && (<Text style={styles.error}>{error}</Text>)}
-      <TouchableOpacity style={styles.button}
+      <Button
         onPress={() => {
           login();
-        }}>
-        <Text style={styles.buttonText}>Sign In</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button}
+        }}
+        title='Sign in'
+        small={false}
+      />
+
+      <TouchableOpacity
         onPress={() => {
           router.replace('/sign-up');
         }}>
         <Text style={styles.buttonText}>Sign up</Text>
       </TouchableOpacity>
-    </View>
+    </View >
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#bbbbbb',
+    backgroundColor: '#ffffff',
+    padding: 16,
+  },
+  header: {
+    fontWeight: 'bold',
+    fontSize: 32,
+    marginVertical: 32,
   },
   textInput: {
     backgroundColor: '#ffffff',
-    paddingVertical: 8,
-    paddingHorizontal: 32,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
     width: '100%',
     marginBottom: 8,
+    borderWidth: 2,
+    borderRadius: 4,
+    borderColor: '#aaaaaa',
+
   },
   error: {
     color: '#ff0000',
@@ -71,6 +84,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   buttonText: {
-    color: '#ffffff',
+    color: '#333333',
+    fontWeight: 'bold',
+    marginVertical: 32,
   },
 });

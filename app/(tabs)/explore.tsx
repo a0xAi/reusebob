@@ -15,16 +15,45 @@ export default function ExploreScreen() {
   }, []);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <Text>Explore here</Text>
       <View>
         {listings.map((listing, key) => (
-          <View>
-            <Text>{listing.name}</Text>
-            <Text>{listing.price}</Text>
+          <View style={styles.listing}>
+            <View style={styles.photoPlaceholder}>
+              <Text style={styles.photoPlaceholderText}>Photo</Text>
+            </View>
+            <View style={{ paddingHorizontal: 8, }}>
+              <Text>{listing.name}</Text>
+              <Text>{(listing.price / 100).toFixed(2)} €</Text>
+            </View>
           </View>
         ))}
       </View>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#ffffff',
+    flex: 1,
+    padding: 16,
+  },
+  listing: {
+    padding: 8,
+    flexDirection: 'row'
+  },
+  photoPlaceholder: {
+    backgroundColor: '#555555',
+    width: 96,
+    height: 96,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+  },
+  photoPlaceholderText: {
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+});
