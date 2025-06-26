@@ -81,8 +81,21 @@ export default function CreateScreen() {
           contentContainerStyle={styles.container}
         >
           <Text style={styles.title}>Įkelti prekę</Text>
+          <View style={styles.photosContainer}>
+            {photos.map((uri, index) => (
+              <View key={index} style={styles.photoWrapper}>
+                <Image source={{ uri }} style={styles.thumbnail} />
+                <TouchableOpacity
+                  style={styles.removeButton}
+                  onPress={() => removePhoto(index)}
+                >
+                  <Text style={styles.removeButtonText}>×</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
           <Button
-            title="Pasirinkti nuotrauką"
+            title="Pridėti nuotrauką"
             onPress={pickImage}
           />
           <View style={{ height: 16 }} />
@@ -125,20 +138,6 @@ export default function CreateScreen() {
               <Picker.Item label={cat} value={cat} key={cat} />
             ))}
           </Picker> */}
-
-          <View style={styles.photosContainer}>
-            {photos.map((uri, index) => (
-              <View key={index} style={styles.photoWrapper}>
-                <Image source={{ uri }} style={styles.thumbnail} />
-                <TouchableOpacity
-                  style={styles.removeButton}
-                  onPress={() => removePhoto(index)}
-                >
-                  <Text style={styles.removeButtonText}>×</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
 
           <Button
             title="Įkelti"
