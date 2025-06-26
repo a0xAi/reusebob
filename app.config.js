@@ -29,6 +29,7 @@ module.exports = {
     },
     plugins: [
       "expo-router",
+      "expo-font",
       [
         "expo-splash-screen",
         {
@@ -41,6 +42,17 @@ module.exports = {
     ],
     experiments: {
       typedRoutes: true
+    },
+    extra: {
+      eas: {
+        projectId: "7bc88413-2062-483e-83e4-b37c94119d1c"
+      }
+    },
+    updates: {
+      url: "https://u.expo.dev/7bc88413-2062-483e-83e4-b37c94119d1c"
+    },
+    runtimeVersion: {
+      policy: "appVersion"
     }
   }
 }

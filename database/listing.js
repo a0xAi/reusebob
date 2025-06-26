@@ -1,5 +1,5 @@
 import app from '../firebaseConfig';
-import { getFirestore, collection, addDoc, getDocs, } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, doc, getDoc, query, where } from "firebase/firestore";
 
 const db = getFirestore(app);
 
@@ -10,7 +10,6 @@ export const createListing = async (
   description,
   quantity,
   category,
-  photoUrl,
 ) => {
   try {
     console.log({
@@ -20,7 +19,6 @@ export const createListing = async (
       description,
       quantity,
       category,
-      photoUrl,
       sold: false,
     })
     const docRef = await addDoc(collection(db, "listings"), {
@@ -30,20 +28,45 @@ export const createListing = async (
       description,
       quantity,
       category,
-      photoUrl,
       sold: false,
     });
     console.log("Document written with ID: ", docRef.id);
+    return docRef.id;
   } catch (e) {
     console.error("Error adding document: ", e);
   }
 }
 
+export const addPhoto = async (listingId, url) => {
+  try {
+    await addDoc(collection(db, 'photos'), { listingRef: listingId, url });
+  } catch (e) {
+    console.error('Error adding photo:', e);
+  }
+};
+
 export const getAllListings = async () => {
-  const querySnapshot = await getDocs(collection(db, "listings"));
+  const db = getFirestore(app);
+  const listingsSnap = await getDocs(collection(db, 'listings'));
   const listings = [];
-  querySnapshot.forEach((doc) => {
-    listings.push({ id: doc.id, ...doc.data() });
-  });
+  for (const docSnap of listingsSnap.docs) {
+    const id = docSnap.id;
+    const data = docSnap.data();
+    const photosQuery = query(collection(db, 'photos'), where('listingRef', '==', id));
+    const photosSnap = await getDocs(photosQuery);
+    const photos = photosSnap.docs.map(d => d.data().url);
+    listings.push({ id, ...data, photos });
+  }
   return listings;
+};
+
+export const getListingByID = async (id) => {
+  const docRef = doc(db, "listings", id);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...docSnap.data() };
+  } else {
+    console.log("No such document!");
+    return null;
+  }
 }

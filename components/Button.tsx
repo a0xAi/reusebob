@@ -34,7 +34,8 @@ const Button: React.FC<ButtonProps> = ({ title, onPress, small = false }) => {
       borderWidth: 0,
       paddingVertical: small ? 8 : 16,
       paddingHorizontal: small ? 16 : 24,
-      borderRadius: 32,
+      borderRadius: 16,
+      width: '100%',
     }} onPressIn={handlePressIn} onPressOut={handlePressOut}>
       <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
         <Text style={[styles.text, {

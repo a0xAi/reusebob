@@ -20,15 +20,15 @@ export default function ExploreScreen() {
     <SafeAreaView style={styles.container}>
       <FlatList
         data={listings}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.card}
             onPress={() => router.push(`/listing?id=${item.id}`)}
           >
-            {item.photoUrl ? (
-              <Image source={{ uri: item.photoUrl }} style={styles.thumbnail} />
+            {item.photos && item.photos.length > 0 ? (
+              <Image source={{ uri: item.photos[0] }} style={styles.thumbnail} />
             ) : (
               <View style={styles.imagePlaceholder}>
                 <Text style={styles.placeholderText}>No Image</Text>

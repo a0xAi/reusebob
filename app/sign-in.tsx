@@ -9,8 +9,8 @@ import Button from '@/components/Button';
 export default function SignIn() {
   const { signIn } = useSession();
   const auth = getAuth(app);
-  const [email, setEmail] = useState('1st@reusebob.com');
-  const [password, setPassword] = useState('123123123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const login = () => {
     signInWithEmailAndPassword(auth, email, password)
@@ -30,14 +30,14 @@ export default function SignIn() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>ReuseBob</Text>
-      <TextInput style={styles.textInput} placeholder='email' value={email} onChangeText={(text) => setEmail(text)} />
-      <TextInput style={styles.textInput} placeholder='password' value={password} onChangeText={(text) => setPassword(text)} />
+      <TextInput style={styles.textInput} placeholderTextColor='#444' placeholder='El. paštas' value={email} onChangeText={(text) => setEmail(text)} />
+      <TextInput style={styles.textInput} laceholderTextColor='#444' placeholder='Slaptažodis' value={password} onChangeText={(text) => setPassword(text)} />
       {error && (<Text style={styles.error}>{error}</Text>)}
       <Button
         onPress={() => {
           login();
         }}
-        title='Sign in'
+        title='Prisijungti'
         small={false}
       />
 
@@ -45,7 +45,7 @@ export default function SignIn() {
         onPress={() => {
           router.replace('/sign-up');
         }}>
-        <Text style={styles.buttonText}>Sign up</Text>
+        <Text style={styles.buttonText}>Registracija</Text>
       </TouchableOpacity>
     </View >
   );
@@ -62,17 +62,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 32,
     marginVertical: 32,
+    fontFamily: 'Inter_900Black',
   },
   textInput: {
+    fontFamily: 'Inter_500Medium',
     backgroundColor: '#ffffff',
     paddingVertical: 16,
     paddingHorizontal: 16,
     width: '100%',
     marginBottom: 8,
-    borderWidth: 2,
-    borderRadius: 4,
-    borderColor: '#aaaaaa',
-
+    borderWidth: 3,
+    borderRadius: 8,
+    borderColor: '#dddddd',
   },
   error: {
     color: '#ff0000',
