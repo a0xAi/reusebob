@@ -3,12 +3,34 @@ import { getFirestore, collection, addDoc, getDocs, } from "firebase/firestore";
 
 const db = getFirestore(app);
 
-export const createListing = async (userRef, name, price) => {
+export const createListing = async (
+  userRef,
+  name,
+  price,
+  description,
+  quantity,
+  category,
+  photoUrl,
+) => {
   try {
+    console.log({
+      userRef,
+      name,
+      price,
+      description,
+      quantity,
+      category,
+      photoUrl,
+      sold: false,
+    })
     const docRef = await addDoc(collection(db, "listings"), {
-      userRef: userRef,
-      name: name,
-      price: price,
+      userRef,
+      name,
+      price,
+      description,
+      quantity,
+      category,
+      photoUrl,
       sold: false,
     });
     console.log("Document written with ID: ", docRef.id);
@@ -21,7 +43,7 @@ export const getAllListings = async () => {
   const querySnapshot = await getDocs(collection(db, "listings"));
   const listings = [];
   querySnapshot.forEach((doc) => {
-    listings.push(doc.data());
+    listings.push({ id: doc.id, ...doc.data() });
   });
   return listings;
 }
