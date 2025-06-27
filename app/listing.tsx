@@ -21,19 +21,22 @@ export default function ListingScreen() {
     if (id) {
       const fetchListing = async () => {
         const db = getFirestore(app);
+        console.log('in fetch', id)
         const docRef = doc(db, 'listings', id);
         const docSnap = await getDoc(docRef);
+        console.log('exists?', docSnap.exists())
         if (docSnap.exists()) {
           setListing({ id: docSnap.id, ...docSnap.data() });
           const photosQuery = query(
             collection(db, 'photos'),
-            where('listingRef', '==', id)
+            where('listingRef', '==', docRef)
           );
-          const sellerRef = doc(db, 'users', docSnap.data().userRef);
-          const sellerSnap = await getDoc(sellerRef);
+          const userRef = docSnap.data().userRef;
+          const sellerSnap = await getDoc(userRef);
+          const sellerData = sellerSnap.data();
+          setSeller(sellerData);
           const photosSnap = await getDocs(photosQuery);
           setPhotos(photosSnap.docs.map(d => d.data().url));
-          setSeller(sellerSnap.data())
           setLoading(false);
         }
       };

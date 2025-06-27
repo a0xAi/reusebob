@@ -24,7 +24,7 @@ export const createListing = async (
       sold: false,
     })
     const docRef = await addDoc(collection(db, "listings"), {
-      userRef,
+      userRef: doc(db, 'users', userRef),
       name,
       price,
       description,
@@ -42,7 +42,7 @@ export const createListing = async (
 
 export const addPhoto = async (listingId, url) => {
   try {
-    await addDoc(collection(db, 'photos'), { listingRef: listingId, url });
+    await addDoc(collection(db, 'photos'), { listingRef: doc(db, 'listings', listingId), url });
   } catch (e) {
     console.error('Error adding photo:', e);
   }
@@ -55,7 +55,7 @@ export const getAllListings = async () => {
   for (const docSnap of listingsSnap.docs) {
     const id = docSnap.id;
     const data = docSnap.data();
-    const photosQuery = query(collection(db, 'photos'), where('listingRef', '==', id));
+    const photosQuery = query(collection(db, 'photos'), where('listingRef', '==', doc(db, 'listings', id)));
     const photosSnap = await getDocs(photosQuery);
     const photos = photosSnap.docs.map(d => d.data().url);
     listings.push({ id, ...data, photos });
@@ -76,7 +76,7 @@ export const getListingsBySubcategory = async (subcategory) => {
     const data = docSnap.data();
     const photosQuery = query(
       collection(db, 'photos'),
-      where('listingRef', '==', id)
+      where('listingRef', '==', doc(db, 'listings', id))
     );
     const photosSnap = await getDocs(photosQuery);
     const photos = photosSnap.docs.map(d => d.data().url);
