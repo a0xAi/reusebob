@@ -86,7 +86,7 @@ export default function ListingScreen() {
       )}
       <Text>{JSON.stringify(seller)}</Text>
       <Text style={styles.name}>{listing.name}</Text>
-      <Text style={styles.category}>{listing.category}</Text>
+      <Text style={styles.category}>{listing.category} / {listing.subcategory}</Text>
       <Text style={styles.price}>{(listing.price / 100).toFixed(2)} €</Text>
       <Text style={styles.description}>{listing.description}</Text>
     </ScrollView>

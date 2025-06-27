@@ -1,20 +1,25 @@
 import { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, SafeAreaView, Image, FlatList, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, SafeAreaView, Image, FlatList, TouchableOpacity, Dimensions } from 'react-native';
 import { getAllListings } from '../../database/listing';
 import { useRouter } from 'expo-router';
 import Search from '@/components/Search';
-import { ScrollView, Dimensions, Text as RNText } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 export default function ExploreScreen() {
   const { width } = Dimensions.get('window');
   const [listings, setListings] = useState([]);
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadListings = async () => {
     const listingsRaw = await getAllListings()
     setListings(listingsRaw);
   }
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadListings();
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     loadListings()
@@ -25,6 +30,8 @@ export default function ExploreScreen() {
       <Search />
       <FlatList
         data={listings}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         keyExtractor={item => item.id}
         numColumns={2}
         contentContainerStyle={styles.list}

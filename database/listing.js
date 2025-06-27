@@ -10,6 +10,7 @@ export const createListing = async (
   description,
   quantity,
   category,
+  subcategory
 ) => {
   try {
     console.log({
@@ -19,6 +20,7 @@ export const createListing = async (
       description,
       quantity,
       category,
+      subcategory,
       sold: false,
     })
     const docRef = await addDoc(collection(db, "listings"), {
@@ -28,6 +30,7 @@ export const createListing = async (
       description,
       quantity,
       category,
+      subcategory,
       sold: false,
     });
     console.log("Document written with ID: ", docRef.id);

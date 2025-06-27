@@ -1,22 +1,26 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
-import { Picker } from '@react-native-picker/picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import app from '../../firebaseConfig';
-import { Text, View, StyleSheet, SafeAreaView, TextInput, Image, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, SafeAreaView, TextInput, Image, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Modal } from 'react-native';
 import { createListing, addPhoto } from '../../database/listing';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import { useSession } from '../../ctx';
+import categories from '../../constants/categories';
 
 export default function CreateScreen() {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [quantity, setQuantity] = useState('');
-  const [category, setCategory] = useState('-');
-  const [categories] = useState(['Vinys', 'Sraigtai', 'Lentos']);
   const [photos, setPhotos] = useState<string[]>([]);
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+  const [isCatModalVisible, setCatModalVisible] = useState(false);
+  const [modalLevel, setModalLevel] = useState<0 | 1>(0);
+  const [modalCategory, setModalCategory] = useState<string | null>(null);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -57,7 +61,8 @@ export default function CreateScreen() {
       price,
       description,
       parseInt(quantity, 10),
-      category
+      selectedCategory!,
+      selectedSubcategory!
     );
     // then upload each photo to storage and register it in Firestore
     const storage = getStorage(app);
@@ -95,6 +100,22 @@ export default function CreateScreen() {
               </View>
             ))}
           </View>
+
+          <TouchableOpacity
+            style={styles.categoryButton}
+            onPress={() => {
+              setModalLevel(0);
+              setModalCategory(null);
+              setCatModalVisible(true);
+            }}
+          >
+            <Text style={styles.categoryButtonText}>
+              {selectedCategory
+                ? `${selectedCategory} > ${selectedSubcategory}`
+                : 'Pasirinkti kategoriją'}
+            </Text>
+          </TouchableOpacity>
+
           <Button
             title="Pridėti nuotrauką"
             onPress={pickImage}
@@ -141,6 +162,56 @@ export default function CreateScreen() {
             title="Įkelti"
             onPress={create}
           />
+
+          {/* Modal category/subcategory selection */}
+          <Modal
+            visible={isCatModalVisible}
+            transparent
+            animationType="slide"
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                {(() => {
+                  // compute cat and subItems above the return
+                  const cat = categories.find(c => c.name === modalCategory);
+                  const subItems = modalLevel === 0
+                    ? categories
+                    : cat?.subcategories || [];
+                  return (
+                    <>
+                      {subItems.map(item => {
+                        const label = typeof item === 'string' ? item : item.name;
+                        return (
+                          <TouchableOpacity
+                            key={label}
+                            style={styles.modalItem}
+                            onPress={() => {
+                              if (modalLevel === 0) {
+                                setModalCategory(label);
+                                setModalLevel(1);
+                              } else {
+                                setSelectedCategory(modalCategory);
+                                setSelectedSubcategory(label);
+                                setCatModalVisible(false);
+                              }
+                            }}
+                          >
+                            <Text style={styles.modalText}>{label}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </>
+                  );
+                })()}
+                <TouchableOpacity
+                  style={styles.modalClose}
+                  onPress={() => setCatModalVisible(false)}
+                >
+                  <Text style={styles.modalCloseText}>Uždaryti</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </ScrollView>
       </SafeAreaView>
     </KeyboardAvoidingView>
@@ -177,6 +248,48 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 8,
+  },
+  categoryButton: {
+    backgroundColor: '#f0f0f0',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  categoryButtonText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  modal: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+  },
+  modalItem: {
+    paddingVertical: 12,
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  modalClose: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  modalCloseText: {
+    fontSize: 16,
+    color: '#007AFF',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
   },
   removeButton: {
     position: 'absolute',
