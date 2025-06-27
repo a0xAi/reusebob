@@ -1,14 +1,20 @@
-import { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, ScrollView, Image } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
+import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { ScrollView as RNScrollView } from 'react-native';
 import app from '../../firebaseConfig';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Button from '@/components/Button';
 
 export default function ListingScreen() {
   const { id } = useLocalSearchParams();
   const [listing, setListing] = useState<any>(null);
   const [photos, setPhotos] = useState<string[]>([]);
+  const [seller, setSeller] = useState(null);
+  const scrollRef = useRef<ScrollView>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const { width } = Dimensions.get('window');
 
   useEffect(() => {
     if (id) {
@@ -22,8 +28,11 @@ export default function ListingScreen() {
             collection(db, 'photos'),
             where('listingRef', '==', id)
           );
+          const sellerRef = doc(db, 'users', listing.userRef);
+          const sellerSnap = await getDoc(sellerRef);
           const photosSnap = await getDocs(photosQuery);
           setPhotos(photosSnap.docs.map(d => d.data().url));
+          setSeller(sellerSnap.data())
         }
       };
       fetchListing();
@@ -41,15 +50,36 @@ export default function ListingScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {photos.length > 0 ? (
-        <RNScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.photosContainer}
-        >
-          {photos.map((uri, idx) => (
-            <Image key={idx} source={{ uri }} style={styles.image} />
-          ))}
-        </RNScrollView>
+        <>
+          <RNScrollView
+            ref={scrollRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={e => {
+              const idx = Math.round(e.nativeEvent.contentOffset.x / width);
+              setActiveIndex(idx);
+            }}
+            scrollEventThrottle={16}
+            style={styles.photosContainer}
+          >
+            {photos.map((uri, idx) => (
+              <Image key={idx} source={{ uri }} style={[styles.image, { width }]} />
+            ))}
+          </RNScrollView>
+          <Text>{JSON.stringify(seller)}</Text>
+          <View style={styles.dots}>
+            {photos.map((_, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.dot,
+                  i === activeIndex && styles.dotActive
+                ]}
+              />
+            ))}
+          </View>
+        </>
       ) : (
         <View style={styles.imagePlaceholder}>
           <Text style={styles.placeholderText}>No Image</Text>
@@ -59,10 +89,6 @@ export default function ListingScreen() {
       <Text style={styles.category}>{listing.category}</Text>
       <Text style={styles.price}>{(listing.price / 100).toFixed(2)} €</Text>
       <Text style={styles.description}>{listing.description}</Text>
-      <Text style={styles.quantity}>Quantity: {listing.quantity}</Text>
-      <View
-        style={[styles.colorSwatch, { backgroundColor: listing.color }]}
-      />
     </ScrollView>
   );
 }
@@ -126,5 +152,71 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 4,
+  },
+  badgesContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#eaf4fc',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  badgeText: {
+    marginLeft: 4,
+    fontSize: 12,
+    color: '#333',
+  },
+  shippingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fcebea',
+    padding: 8,
+    marginHorizontal: 16,
+    borderRadius: 4,
+    marginBottom: 12,
+  },
+  shippingText: {
+    marginLeft: 6,
+    color: '#c0392b',
+    fontSize: 14,
+  },
+  buyerProtection: {
+    fontSize: 14,
+    color: '#2c3e50',
+    marginTop: 4,
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  outlineButton: {
+    flex: 1,
+    marginRight: 8,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#007AFF',
+  },
+  solidButton: {
+    flex: 1,
+    backgroundColor: '#007AFF',
+  },
+  dots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 8,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#ccc',
+    marginHorizontal: 4,
+  },
+  dotActive: {
+    backgroundColor: '#333',
   },
 });

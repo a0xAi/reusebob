@@ -10,8 +10,8 @@ import Input from '@/components/Input';
 import { useSession } from '../../ctx';
 
 export default function CreateScreen() {
-  const [name, setName] = useState('Test item' + Date.now());
-  const [price, setPrice] = useState('9999');
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [quantity, setQuantity] = useState('');
   const [category, setCategory] = useState('-');

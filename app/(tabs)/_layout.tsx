@@ -24,26 +24,29 @@ export default function TabLayout() {
         }),
       }}>
       <Tabs.Screen
-        name="index"
+        name="explore"
         options={{
-          title: 'Profilis',
-          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="person" color={color} />,
+          title: 'Pradinis',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="home" color={color} />,
         }}
       />
       <Tabs.Screen
         name="create"
         options={{
-          title: 'Įkelti',
+          title: 'Parduoti',
           tabBarIcon: ({ color }) => <MaterialIcons size={28} name="add-circle-outline" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="index"
         options={{
-          title: 'Naršyti',
-          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="home" color={color} />,
+          title: 'Paskyra',
+          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="person" color={color} />,
         }}
       />
+
+
     </Tabs>
   );
 }
