@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, SafeAreaView, Image, FlatList, TouchableOpacity, Dimensions } from 'react-native';
 import { getAllListings } from '../../database/listing';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import Search from '@/components/Search';
 
 export default function ExploreScreen() {
@@ -9,10 +9,15 @@ export default function ExploreScreen() {
   const [listings, setListings] = useState([]);
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
+  const { subcategory } = useLocalSearchParams();
 
   const loadListings = async () => {
-    const listingsRaw = await getAllListings()
-    setListings(listingsRaw);
+    const listingsRaw = await getAllListings();
+    if (subcategory) {
+      setListings(listingsRaw.filter(l => l.subcategory === subcategory));
+    } else {
+      setListings(listingsRaw);
+    }
   }
 
   const onRefresh = async () => {
@@ -22,8 +27,8 @@ export default function ExploreScreen() {
   };
 
   useEffect(() => {
-    loadListings()
-  }, []);
+    loadListings();
+  }, [subcategory]);
 
   return (
     <SafeAreaView style={styles.container}>
