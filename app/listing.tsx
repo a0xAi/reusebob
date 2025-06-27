@@ -3,12 +3,11 @@ import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions
 import { useLocalSearchParams } from 'expo-router';
 import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { ScrollView as RNScrollView } from 'react-native';
-import app from '../../firebaseConfig';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Button from '@/components/Button';
+import app from '../firebaseConfig';
 
 export default function ListingScreen() {
   const { id } = useLocalSearchParams();
+  const [loading, setLoading] = useState(true);
   const [listing, setListing] = useState<any>(null);
   const [photos, setPhotos] = useState<string[]>([]);
   const [seller, setSeller] = useState(null);
@@ -28,18 +27,19 @@ export default function ListingScreen() {
             collection(db, 'photos'),
             where('listingRef', '==', id)
           );
-          const sellerRef = doc(db, 'users', listing.userRef);
+          const sellerRef = doc(db, 'users', docSnap.data().userRef);
           const sellerSnap = await getDoc(sellerRef);
           const photosSnap = await getDocs(photosQuery);
           setPhotos(photosSnap.docs.map(d => d.data().url));
           setSeller(sellerSnap.data())
+          setLoading(false);
         }
       };
       fetchListing();
     }
   }, [id]);
 
-  if (!listing) {
+  if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <Text>Loading...</Text>
@@ -67,7 +67,6 @@ export default function ListingScreen() {
               <Image key={idx} source={{ uri }} style={[styles.image, { width }]} />
             ))}
           </RNScrollView>
-          <Text>{JSON.stringify(seller)}</Text>
           <View style={styles.dots}>
             {photos.map((_, i) => (
               <View
@@ -85,6 +84,7 @@ export default function ListingScreen() {
           <Text style={styles.placeholderText}>No Image</Text>
         </View>
       )}
+      <Text>{JSON.stringify(seller)}</Text>
       <Text style={styles.name}>{listing.name}</Text>
       <Text style={styles.category}>{listing.category}</Text>
       <Text style={styles.price}>{(listing.price / 100).toFixed(2)} €</Text>
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container: {
-    padding: 16,
+    // padding: 16,
   },
   photosContainer: {
     flexDirection: 'row',
@@ -108,9 +108,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: 200,
-    height: 200,
-    borderRadius: 8,
-    marginRight: 8,
+    height: 400,
   },
   imagePlaceholder: {
     width: '100%',
@@ -142,67 +140,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     marginBottom: 8,
-  },
-  quantity: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 16,
-  },
-  colorSwatch: {
-    width: 50,
-    height: 50,
-    borderRadius: 4,
-  },
-  badgesContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    marginBottom: 12,
-  },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#eaf4fc',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginRight: 8,
-  },
-  badgeText: {
-    marginLeft: 4,
-    fontSize: 12,
-    color: '#333',
-  },
-  shippingBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fcebea',
-    padding: 8,
-    marginHorizontal: 16,
-    borderRadius: 4,
-    marginBottom: 12,
-  },
-  shippingText: {
-    marginLeft: 6,
-    color: '#c0392b',
-    fontSize: 14,
-  },
-  buyerProtection: {
-    fontSize: 14,
-    color: '#2c3e50',
-    marginTop: 4,
-    marginHorizontal: 16,
-    marginBottom: 16,
-  },
-  outlineButton: {
-    flex: 1,
-    marginRight: 8,
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#007AFF',
-  },
-  solidButton: {
-    flex: 1,
-    backgroundColor: '#007AFF',
   },
   dots: {
     flexDirection: 'row',

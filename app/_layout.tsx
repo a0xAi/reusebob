@@ -44,6 +44,7 @@ function RootNavigator() {
     }}>
       <Stack.Protected guard={session}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="listing" />
       </Stack.Protected>
 
       <Stack.Protected guard={!session}>
