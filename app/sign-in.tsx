@@ -12,6 +12,7 @@ export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+
   const login = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
@@ -31,7 +32,7 @@ export default function SignIn() {
     <View style={styles.container}>
       <Text style={styles.header}>ReuseBob</Text>
       <TextInput style={styles.textInput} placeholderTextColor='#444' placeholder='El. paštas' value={email} onChangeText={(text) => setEmail(text)} />
-      <TextInput style={styles.textInput} laceholderTextColor='#444' placeholder='Slaptažodis' value={password} onChangeText={(text) => setPassword(text)} />
+      <TextInput style={styles.textInput} placeholderTextColor='#444' placeholder='Slaptažodis' value={password} onChangeText={(text) => setPassword(text)} />
       {error && (<Text style={styles.error}>{error}</Text>)}
       <Button
         onPress={() => {

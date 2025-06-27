@@ -3,11 +3,12 @@ import { getFirestore, getDoc, setDoc, doc, } from "firebase/firestore";
 
 const db = getFirestore(app);
 
-export const createUser = async (id, email) => {
+export const createUser = async (id, email, name) => {
   try {
     const userRef = doc(db, 'users', id)
     await setDoc(userRef, {
       email: email,
+      name: name,
       createdAt: new Date()
     })
 

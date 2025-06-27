@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import { useSession } from '../../ctx';
 import { getUserByID } from '@/database/user';
+import RichMenuItem from '@/components/RichMenuItem';
 
 export default function HomeScreen() {
   const { signOut, session } = useSession();
@@ -17,12 +18,11 @@ export default function HomeScreen() {
     }
   }, []);
 
-  // if (!user) {
-  //   return null;
-  // }
-
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={styles.container}>
+      <RichMenuItem
+        name={user?.name}
+      />
       <Text>{JSON.stringify(user)}</Text>
       <Text
         onPress={() => {
@@ -33,3 +33,10 @@ export default function HomeScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#ffffff',
+    flex: 1,
+  }
+});

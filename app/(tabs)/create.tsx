@@ -6,6 +6,7 @@ import app from '../../firebaseConfig';
 import { Text, View, StyleSheet, SafeAreaView, TextInput, Image, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
 import { createListing, addPhoto } from '../../database/listing';
 import Button from '@/components/Button';
+import Input from '@/components/Input';
 import { useSession } from '../../ctx';
 
 export default function CreateScreen() {
@@ -99,35 +100,32 @@ export default function CreateScreen() {
             onPress={pickImage}
           />
           <View style={{ height: 16 }} />
-          <TextInput
-            style={styles.input}
-            placeholder="Name"
+          <Input
+            label='Pavadinimas'
             value={name}
             onChangeText={setName}
           />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Price"
+          <Input
+            label='Kaina'
             value={price}
             onChangeText={setPrice}
             keyboardType="numeric"
           />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Description"
+          <Input
+            label='Aprašymas'
             value={description}
             onChangeText={setDescription}
+            multiline={true}
           />
 
-          <TextInput
+          {/* <TextInput
             style={styles.input}
             placeholder="Quantity"
             value={quantity}
             onChangeText={setQuantity}
             keyboardType="numeric"
-          />
+          /> */}
 
           {/* <Picker
             selectedValue={category}
@@ -159,17 +157,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 16,
     fontFamily: 'Inter_700Bold',
-  },
-  input: {
-    fontFamily: 'Inter_500Medium',
-    backgroundColor: '#ffffff',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    width: '100%',
-    marginBottom: 8,
-    borderWidth: 3,
-    borderRadius: 8,
-    borderColor: '#dddddd',
   },
   picker: { height: 150, marginBottom: 12 },
   colorPicker: { height: 200, marginBottom: 12 },

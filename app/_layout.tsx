@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
-import { Inter_500Medium, Inter_700Bold, Inter_900Black, useFonts } from '@expo-google-fonts/inter';
+import { Inter_400Regular, Inter_500Medium, Inter_700Bold, Inter_900Black, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { SessionProvider, useSession } from '../ctx';
 import { SplashScreenController } from '../splash';
@@ -10,6 +10,7 @@ SplashScreen.preventAutoHideAsync();
 export default function Root() {
 
   const [loaded, error] = useFonts({
+    Inter_400Regular,
     Inter_500Medium,
     Inter_700Bold,
     Inter_900Black,
@@ -38,7 +39,9 @@ function RootNavigator() {
   const { session } = useSession();
 
   return (
-    <Stack>
+    <Stack screenOptions={{
+      headerShown: false,
+    }}>
       <Stack.Protected guard={session}>
         <Stack.Screen name="(tabs)" />
       </Stack.Protected>
@@ -50,6 +53,6 @@ function RootNavigator() {
       <Stack.Protected guard={!session}>
         <Stack.Screen name="sign-up" />
       </Stack.Protected>
-    </Stack>
+    </Stack >
   );
 }
