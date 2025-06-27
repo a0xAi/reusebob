@@ -1,8 +1,25 @@
 import { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, SafeAreaView, Image, FlatList, TouchableOpacity, Dimensions } from 'react-native';
+import { Text, View, StyleSheet, SafeAreaView, Image, FlatList, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 import { getAllListings, getListingsBySubcategory } from '../../database/listing';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Search from '@/components/Search';
+
+const ListingImage = ({ uri }: { uri: string }) => {
+  const [loading, setLoading] = useState(true);
+  return (
+    <View style={styles.imageWrapper}>
+      {loading && (
+        <ActivityIndicator style={styles.imageLoader} size="small" color="#888" />
+      )}
+      <Image
+        source={{ uri }}
+        style={styles.cardImage}
+        onLoadStart={() => setLoading(true)}
+        onLoadEnd={() => setLoading(false)}
+      />
+    </View>
+  );
+};
 
 export default function ExploreScreen() {
   const { width } = Dimensions.get('window');
@@ -61,10 +78,7 @@ export default function ExploreScreen() {
           >
             <View>
               {item.photos && item.photos.length > 0 ? (
-                <Image
-                  source={{ uri: item.photos[0] }}
-                  style={styles.cardImage}
-                />
+                <ListingImage uri={item.photos[0]} />
               ) : (
                 <View style={styles.imagePlaceholder}>
                   <Text style={styles.placeholderText}>No Image</Text>
@@ -115,6 +129,16 @@ const styles = StyleSheet.create({
   placeholderText: {
     color: '#888',
   },
+  imageWrapper: {
+    width: '100%',
+    height: 240,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imageLoader: {
+    position: 'absolute',
+  },
   cardContent: {
     flex: 1,
     padding: 8,
@@ -150,8 +174,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   cardImage: {
-    // width: '100%',
-    height: 240,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   likeButton: {
     position: 'absolute',
