@@ -63,6 +63,28 @@ export const getAllListings = async () => {
   return listings;
 };
 
+export const getListingsBySubcategory = async (subcategory) => {
+  const db = getFirestore(app);
+  const listingsQuery = query(
+    collection(db, 'listings'),
+    where('subcategory', '==', subcategory)
+  );
+  const listingsSnap = await getDocs(listingsQuery);
+  const listings = [];
+  for (const docSnap of listingsSnap.docs) {
+    const id = docSnap.id;
+    const data = docSnap.data();
+    const photosQuery = query(
+      collection(db, 'photos'),
+      where('listingRef', '==', id)
+    );
+    const photosSnap = await getDocs(photosQuery);
+    const photos = photosSnap.docs.map(d => d.data().url);
+    listings.push({ id, ...data, photos });
+  }
+  return listings;
+};
+
 export const getListingByID = async (id) => {
   const docRef = doc(db, "listings", id);
   const docSnap = await getDoc(docRef);

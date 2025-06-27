@@ -4,6 +4,8 @@ import { useLocalSearchParams } from 'expo-router';
 import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { ScrollView as RNScrollView } from 'react-native';
 import app from '../firebaseConfig';
+import Button from '@/components/Button';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function ListingScreen() {
   const { id } = useLocalSearchParams();
@@ -84,11 +86,21 @@ export default function ListingScreen() {
           <Text style={styles.placeholderText}>No Image</Text>
         </View>
       )}
-      <Text>{JSON.stringify(seller)}</Text>
-      <Text style={styles.name}>{listing.name}</Text>
-      <Text style={styles.category}>{listing.category} / {listing.subcategory}</Text>
-      <Text style={styles.price}>{(listing.price / 100).toFixed(2)} €</Text>
-      <Text style={styles.description}>{listing.description}</Text>
+      <View style={styles.descriptionContainer}>
+        <View style={{ flexDirection: 'row', marginBottom: 16, }}>
+          <View style={{ backgroundColor: '#555', width: 36, height: 36, justifyContent: 'center', alignItems: 'center', borderRadius: 18, }}>
+            <MaterialIcons name='person' size={24} color='#fff' />
+          </View>
+          <View style={{ marginLeft: 8, }}>
+            <Text style={{ fontFamily: 'Inter_500Medium' }}>{seller.name}</Text>
+          </View>
+        </View>
+        <Text style={styles.name}>{listing.name}</Text>
+        <Text style={styles.category}>{listing.category} / {listing.subcategory}</Text>
+        <Text style={styles.price}>{(listing.price / 100).toFixed(2)} €</Text>
+        <Text style={styles.description}>{listing.description}</Text>
+        <Button title='Teirautis' />
+      </View>
     </ScrollView>
   );
 }
@@ -100,14 +112,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container: {
-    // padding: 16,
+    backgroundColor: '#ffffff',
+    // flex: 1,
   },
   photosContainer: {
     flexDirection: 'row',
     marginBottom: 16,
   },
   image: {
-    width: 200,
+    // width: 200,
     height: 400,
   },
   imagePlaceholder: {
@@ -121,12 +134,18 @@ const styles = StyleSheet.create({
   placeholderText: {
     color: '#888',
   },
+  descriptionContainer: {
+    padding: 16,
+    flex: 1,
+  },
   name: {
+    fontFamily: 'Inter_700Bold',
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
   },
   category: {
+    fontFamily: 'Inter_500Medium',
     fontSize: 16,
     color: '#666',
     marginBottom: 8,

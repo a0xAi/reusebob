@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { getAllListings } from '../../database/listing';
+import { useFocusEffect } from 'expo-router';
+import { useCallback } from 'react';
 import categories from '@/constants/categories';
 
 export default function SearchScreen() {
@@ -9,12 +11,19 @@ export default function SearchScreen() {
   const [listings, setListings] = useState<any[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    (async () => {
-      const all = await getAllListings();
-      setListings(all);
-    })();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        const all = await getAllListings();
+        setListings(all);
+      })();
+
+      return () => {
+        console.log("This route is now unfocused.");
+      };
+    }, [])
+  );
+
 
   const topCategories = categories.map(c => c.name);
   const subcategories = selectedCategory

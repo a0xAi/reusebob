@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, SafeAreaView, Image, FlatList, TouchableOpacity, Dimensions } from 'react-native';
-import { getAllListings } from '../../database/listing';
+import { getAllListings, getListingsBySubcategory } from '../../database/listing';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Search from '@/components/Search';
 
@@ -12,13 +12,14 @@ export default function ExploreScreen() {
   const { subcategory } = useLocalSearchParams();
 
   const loadListings = async () => {
-    const listingsRaw = await getAllListings();
     if (subcategory) {
-      setListings(listingsRaw.filter(l => l.subcategory === subcategory));
+      const filtered = await getListingsBySubcategory(subcategory);
+      setListings(filtered);
     } else {
-      setListings(listingsRaw);
+      const all = await getAllListings();
+      setListings(all);
     }
-  }
+  };
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -33,6 +34,19 @@ export default function ExploreScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Search />
+      {subcategory && (
+        <View style={styles.filterContainer}>
+          <Text style={styles.filterLabel}>
+            Filtruojama pagal: <Text style={styles.filterValue}>{subcategory}</Text>
+          </Text>
+          <TouchableOpacity
+            style={styles.clearButton}
+            onPress={() => router.push('/explore')}
+          >
+            <Text style={styles.clearButtonText}>Išvalyti</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <FlatList
         data={listings}
         refreshing={refreshing}
@@ -178,5 +192,33 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     marginHorizontal: 8,
     marginBottom: 8,
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#f0f0f0',
+    marginHorizontal: 8,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  filterLabel: {
+    flex: 1,
+    fontSize: 14,
+    color: '#333',
+  },
+  filterValue: {
+    fontWeight: 'bold',
+  },
+  clearButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: '#007AFF',
+    borderRadius: 4,
+  },
+  clearButtonText: {
+    color: '#fff',
+    fontSize: 14,
   },
 });

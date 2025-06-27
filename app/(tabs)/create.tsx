@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import app from '../../firebaseConfig';
-import { Text, View, StyleSheet, SafeAreaView, TextInput, Image, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Modal } from 'react-native';
+import { Text, View, StyleSheet, SafeAreaView, TextInput, Image, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import { createListing, addPhoto } from '../../database/listing';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import { useSession } from '../../ctx';
 import categories from '../../constants/categories';
+import { useRouter } from 'expo-router';
 
 export default function CreateScreen() {
   const [name, setName] = useState('');
@@ -15,12 +16,15 @@ export default function CreateScreen() {
   const [description, setDescription] = useState('');
   const [quantity, setQuantity] = useState('');
   const [photos, setPhotos] = useState<string[]>([]);
+  const [isCreating, setIsCreating] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [isCatModalVisible, setCatModalVisible] = useState(false);
   const [modalLevel, setModalLevel] = useState<0 | 1>(0);
   const [modalCategory, setModalCategory] = useState<string | null>(null);
+
+  const [createdListingId, setCreatedListingId] = useState<string | null>(null);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -43,6 +47,7 @@ export default function CreateScreen() {
     setPhotos(photos.filter((_, i) => i !== index));
   };
   const { session } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
     (async () => {
@@ -54,6 +59,7 @@ export default function CreateScreen() {
   }, []);
 
   const create = async () => {
+    setIsCreating(true);
     // first, create the listing and get its ID
     const listingId = await createListing(
       session,
@@ -74,6 +80,16 @@ export default function CreateScreen() {
       const url = await getDownloadURL(photoRef);
       await addPhoto(listingId, url);
     }
+    setIsCreating(false);
+    // reset all fields
+    setName('');
+    setPrice('');
+    setDescription('');
+    setQuantity('');
+    setPhotos([]);
+    setSelectedCategory(null);
+    setSelectedSubcategory(null);
+    setCreatedListingId(listingId);
   };
 
   return (
@@ -101,6 +117,11 @@ export default function CreateScreen() {
             ))}
           </View>
 
+          <Button
+            title="Pridėti nuotrauką"
+            onPress={pickImage}
+          />
+          <View style={{ height: 16 }} />
           <TouchableOpacity
             style={styles.categoryButton}
             onPress={() => {
@@ -115,11 +136,6 @@ export default function CreateScreen() {
                 : 'Pasirinkti kategoriją'}
             </Text>
           </TouchableOpacity>
-
-          <Button
-            title="Pridėti nuotrauką"
-            onPress={pickImage}
-          />
           <View style={{ height: 16 }} />
           <Input
             label='Pavadinimas'
@@ -140,30 +156,11 @@ export default function CreateScreen() {
             multiline={true}
           />
 
-          {/* <TextInput
-            style={styles.input}
-            placeholder="Quantity"
-            value={quantity}
-            onChangeText={setQuantity}
-            keyboardType="numeric"
-          /> */}
-
-          {/* <Picker
-            selectedValue={category}
-            onValueChange={setCategory}
-            style={styles.picker}
-          >
-            {categories.map(cat => (
-              <Picker.Item label={cat} value={cat} key={cat} />
-            ))}
-          </Picker> */}
-
           <Button
             title="Įkelti"
             onPress={create}
           />
 
-          {/* Modal category/subcategory selection */}
           <Modal
             visible={isCatModalVisible}
             transparent
@@ -213,6 +210,28 @@ export default function CreateScreen() {
             </View>
           </Modal>
         </ScrollView>
+        {!isCreating && createdListingId && (
+          <View style={styles.successOverlay}>
+            <Text style={styles.successText}>Sėkmingai sukurtas skelbimas!</Text>
+            <Button
+              title="Peržiūrėti skelbimą"
+              onPress={() => {
+                router.push(`/listing?id=${createdListingId}`);
+                setCreatedListingId(null);
+              }}
+            />
+            <View style={{ height: 12 }} />
+            <Button
+              title="Uždaryti"
+              onPress={() => setCreatedListingId(null)}
+            />
+          </View>
+        )}
+        {isCreating && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" />
+          </View>
+        )}
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
@@ -256,6 +275,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   categoryButtonText: {
+    fontFamily: 'Inter_500Medium',
     fontSize: 16,
     color: '#333',
   },
@@ -306,5 +326,29 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     lineHeight: 16,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  successOverlay: {
+    position: 'absolute',
+    top: 0, bottom: 0, left: 0, right: 0,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  successText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
   },
 });
